@@ -7,12 +7,8 @@ checking password policy
 - subset of userID
 - contains in Dictionary (460K+ words)
 - Date format
-
-# in process
 - checking pattern (double, triple etc)
 - checking with old password
-- add async to module
-- fix some bugs
 
 # instruction
 cd server
