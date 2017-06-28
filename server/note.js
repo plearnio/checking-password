@@ -16,7 +16,7 @@
 //   name: 'pruek',
 //   surName: 'pakamatawee',
 //   tel: '0950063706',
-// }
+// // }
 
 // const checkPublicInfo = (password) => {
 //   const newArr = Object.keys(UESR_PROFILE).map((data) => {

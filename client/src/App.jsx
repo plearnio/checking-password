@@ -16,13 +16,16 @@ const Input = styled.input`
 const Warning = styled.h2`
   color: #ce9178;
 `
+const Success = styled.h2`
+  color: #dadaa8;
+`
 
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
       value: '',
-      isWeak: true,
+      isWeak: true
     }
     this.handleTyping = this.handleTyping.bind(this)
   }
@@ -32,16 +35,18 @@ class App extends Component {
     this.setState({
       value: password
     }, () => {
-      console.log(password)
       axios.post('http://localhost:4000/checking', {
         data: password
       })
       .then((response) => {
-        console.log(response);
+        this.setState({
+          value: password,
+          isWeak: response.data === 'weak'
+        })
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
     })
   }
 
@@ -51,7 +56,8 @@ class App extends Component {
         <div className="App-header">
           <h2>Checking Password</h2>
           <Input type="password" onChange={this.handleTyping} />
-          <Warning>Weak</Warning>
+          {(this.state.value !== '' && this.state.isWeak) && <Warning> Weak </Warning>}
+          {(this.state.value !== '' && !this.state.isWeak) && <Success> Fair </Success>}
         </div>
       </div>
     )
