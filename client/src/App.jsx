@@ -32,6 +32,7 @@ class App extends Component {
     this.setState({
       value: password
     }, () => {
+      console.log(password)
       axios.post('http://localhost:4000/checking', {
         data: password
       })
