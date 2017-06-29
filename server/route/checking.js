@@ -48,7 +48,7 @@ const checkPattern = (password) => {
   return result
 }
 
-const checkOldPassword = (password, oldPasswords) => {
+const checkOldPasswords = (password, oldPasswords) => {
   const data = password
   const pwd = oldPasswords.map((objPassword) => {
     const hash = crypto.createHash('sha256')
@@ -78,13 +78,13 @@ const checkDictionary = (password) => {
 const checkEightCharactor = password => password.length >= 8
 // const checkSameAsUsername = password => password.includes(USER_ID)
 
-const checkingPassword = (password, oldPasswords) => {
+const isPasswordGoodEnough = (password, oldPasswords = []) => {
   // if (!checkSameAsUsername(password)) return false
+  // if (!checkPattern(password)) return false
+  // if (!checkOldPasswords(password, oldPasswords)) return false
   if (!checkEightCharactor(password)) return false
   if (!checkDictionary(password)) return false
   if (!checkDateFormat(password)) return false
-  if (!checkOldPassword(password, oldPasswords)) return false
-  if (!checkPattern(password)) return false
   return true
 }
 
@@ -103,7 +103,7 @@ checking.route('/')
     response = res
     password = req.body.data
     console.log(`password : ${password}`)    
-    if (checkingPassword(password, oldPasswords)) {
+    if (isPasswordGoodEnough(password, oldPasswords)) {
       console.log('result : fair')
       res.send('fair')
     } else {
@@ -111,4 +111,4 @@ checking.route('/')
       res.send('weak')
     }
   })
-module.exports = { checking, checkPattern, checkOldPassword, checkDateFormat, checkDictionary, checkEightCharactor }
+module.exports = { checking, checkPattern, checkOldPasswords, checkDateFormat, checkDictionary, checkEightCharactor }

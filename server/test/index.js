@@ -2,7 +2,7 @@
 const server = require('../server')
 const {
   checkPattern,
-  checkOldPassword,
+  checkOldPasswords,
   checkDateFormat,
   checkDictionary,
   checkEightCharactor
@@ -18,6 +18,7 @@ const oldPasswords = [
     secret: ['secret1', 'secret2']
   }
 ]
+
 
 describe('Checking 8 characters method', () => {
   it('it should return false if password length less than 8 characters', (done) => {
@@ -56,12 +57,12 @@ describe('Checking date format method', () => {
 
 describe('Checking old password method', () => {
   it('it should return false if password contains in old password', (done) => {
-    checkOldPassword('password2', oldPasswords).should.equal(false)
-    checkOldPassword('password22', oldPasswords).should.equal(false)
+    checkOldPasswords('password2', oldPasswords).should.equal(false)
+    checkOldPasswords('password22', oldPasswords).should.equal(false)
     done()
   })
   it('it should return true if password does not contain in old password', (done) => {
-    checkOldPassword('password222', oldPasswords).should.equal(true)
+    checkOldPasswords('password222', oldPasswords).should.equal(true)
     done()
   })
 })
