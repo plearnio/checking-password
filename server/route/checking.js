@@ -76,7 +76,7 @@ const checkDictionary = (password) => {
 }
 
 const checkEightCharactor = password => password.length >= 8
-const checkSameAsUsername = password => password.includes(USER_ID)
+// const checkSameAsUsername = password => password.includes(USER_ID)
 
 const checkingPassword = (password, oldPasswords) => {
   // if (!checkSameAsUsername(password)) return false
@@ -111,5 +111,4 @@ checking.route('/')
       res.send('weak')
     }
   })
-
-module.exports = checking
+module.exports = { checking, checkPattern, checkOldPassword, checkDateFormat, checkDictionary, checkEightCharactor }
