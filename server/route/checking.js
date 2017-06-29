@@ -63,18 +63,11 @@ const checkOldPasswords = (password, oldPasswords) => {
 }
 
 const checkDateFormat = (password) => {
-  const checkDate = new Date(password)
-  if (checkDate.toString() === 'Invalid Date') return true
-  return false
+  const date = new Date(password)
+  return date.toString() === 'Invalid Date'
 }
 
-const checkDictionary = (password) => {
-  const words = DICTIONARY_DATA
-  const index = words.indexOf(password)
-  if (index === -1) return true
-  return false
-}
-
+const checkDictionary = password => DICTIONARY_DATA.indexOf(password) === -1
 const checkEightCharactor = password => password.length >= 8
 // const checkSameAsUsername = password => password.includes(USER_ID)
 
