@@ -1,6 +1,7 @@
 const express = require('express')
 const crypto = require('crypto')
 const path = require('path')
+const moment = require('moment')
 const fs = require('fs')
 
 const DICTIONARY_DATA = fs.readFileSync(path.join(__dirname, './words.txt'), 'utf8').toString()
@@ -50,62 +51,71 @@ const checkOldPassword = (password, oldPasswords) => {
   return false
 }
 
-const swapCheckDate = (day, month, year) => {
-  const rangeYear = 100
-  const timeNow = new Date()
-  const yearNow = timeNow.getFullYear()
-  const yearNowTh = yearNow + 543
-  if (day < 31 && month < 12 &&
-    ((year <= yearNow + rangeYear && year >= yearNow - rangeYear) ||
-    (year <= yearNowTh + rangeYear && year >= yearNowTh - rangeYear))
-  ) {
-    return false
+const checkRangeDate = (datePassword, format) => {
+  const timeNow = moment(datePassword, format, true)
+  if (timeNow.isValid()) {
+    const rangeYear = 100
+    const yearNow = new Date().getFullYear()
+    const yearNowTh = yearNow + 543
+    const year = timeNow.format('YYYY')
+    if ((year <= yearNow + rangeYear && year >= yearNow - rangeYear) ||
+      (year <= yearNowTh + rangeYear && year >= yearNowTh - rangeYear)) {
+      return true
+    }
   }
-  return true
+  return false
 }
 
 const checkDateFormat = (password) => {
-  const checkDate = new Date(password)
-  if (checkDate.toString() !== 'Invalid Date') {
-    const yearPassword = checkDate.getFullYear().toString()
-    const yearLength = yearPassword.length
-    const rangeYear = 100
-    const timeNow = new Date()
-    const yearNow = timeNow.getFullYear()
-    const yearNowTh = yearNow + 543
-    if (((yearPassword <= yearNow + rangeYear && yearPassword >= yearNow - rangeYear) ||
-    (yearPassword <= yearNowTh + rangeYear && yearPassword >= yearNowTh - rangeYear))) {
-      return false
-    }
-    if (yearLength > 4) {
-      const yearPasswordFirst = Number.parseInt(yearPassword.slice(0, 4), 10)
-      const yearPasswordLast = Number.parseInt(yearPassword.slice(yearLength - 4, yearLength), 10)
-      if (((yearPasswordFirst <= yearNow + rangeYear && yearPasswordFirst >= yearNow - rangeYear) ||
-      (yearPasswordFirst <= yearNowTh + rangeYear && yearPasswordFirst >= yearNowTh - rangeYear))) {
-        return false
-      }
-      if (((yearPasswordLast <= yearNow + rangeYear && yearPasswordLast >= yearNow - rangeYear) ||
-      (yearPasswordLast <= yearNowTh + rangeYear && yearPasswordLast >= yearNowTh - rangeYear))) {
-        return false
-      }
-    }
-  }
   const regexPassword = password.replace(/[^a-zA-Z0-9]/g, '')
-  if (regexPassword) {
-    const splitDay = [0, 0, 2, 6, 4, 6]
-    const splitMonth = [2, 6, 0, 0, 6, 4]
-    const splitYear = [4, 2, 4, 2, 0, 0]
-    for (let i = 0; i < 6; i += 1) {
-      const day = regexPassword.slice(splitDay[i], splitDay[i] + 2)
-      const month = regexPassword.slice(splitMonth[i], splitMonth[i] + 2)
-      const year = regexPassword.slice(splitYear[i], splitYear[i] + 4)
-      if (!swapCheckDate(day, month, year)) return false
-    }
+  const formatMoment = [
+    'DDMMYYYY',
+    'DDYYYYMM',
+    'MMDDYYYY',
+    'MMYYYYDD',
+    'YYYYDDMM',
+    'YYYYMMDD',
+
+    'DDMMMYYYY',
+    'DDYYYYMMM',
+    'MMMDDYYYY',
+    'MMMYYYYDD',
+    'YYYYDDMMM',
+    'YYYYMMMDD',
+
+    'DMMMYYYY',
+    'DYYYYMMM',
+    'MMMDYYYY',
+    'MMMYYYYD',
+    'YYYYDMMM',
+    'YYYYMMMD',
+
+    'DDYYMMMM',
+    'DDMMMMYY',
+    'YYDDMMMM',
+    'YYMMMMDD',
+    'MMMMDDYY',
+    'MMMMYYDD',
+
+    'DDYYYYMMMM',
+    'DDMMMMYYYY',
+    'YYYYDDMMMM',
+    'YYYYMMMMDD',
+    'MMMMDDYYYY',
+    'MMMMYYYYDD',
+
+    'DYYYYMMMM',
+    'DMMMMYYYY',
+    'YYYYDMMMM',
+    'YYYYMMMMD',
+    'MMMMDYYYY',
+    'MMMMYYYYD'
+  ]
+  for (let i = 0; i < formatMoment.length; i += 1) {
+    if (checkRangeDate(regexPassword, formatMoment[i])) return false
   }
   return true
 }
-
-// console.log(checkDateFormat('may'))
 
 const checkDictionary = (password) => {
   const words = DICTIONARY_DATA
@@ -156,6 +166,5 @@ module.exports = {
   checkOldPassword,
   checkDateFormat,
   checkDictionary,
-  checkEightCharactor,
-  checkSameAsUsername
+  checkEightCharactor
 }
