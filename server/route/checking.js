@@ -6,29 +6,28 @@ const fs = require('fs')
 
 const DICTIONARY_DATA = fs.readFileSync(path.join(__dirname, './words.txt'), 'utf8').toString()
 
-const S_1 = ['', '/', '-', ',', '\\']
-const S_2 = ['', '/', '-', ',', '\\']
+const PUNCTUATIONS = ['', '/', '-', ',', '\\']
 const SUB_FORMAT = [
   ['DD', 'DD', 'D', 'DD', 'DD', 'D'],
   ['MM', 'MMM', 'MMM', 'MMMM', 'MMMM', 'MMMM'],
   ['YYYY', 'YYYY', 'YYYY', 'YY', 'YYYY', 'YYYY'],
 ]
 
-const FORMAT_MOMENT = []
-let temp = 0
-for (let m = 0; m < S_1.length; m += 1) {
-  for (let k = 0; k < S_2.length; k += 1) {
-    for (let j = 0; j < SUB_FORMAT[0].length; j += 1) {
-      FORMAT_MOMENT[temp] = `${SUB_FORMAT[0][j]}${S_1[m]}${SUB_FORMAT[1][j]}${S_2[k]}${SUB_FORMAT[2][j]}`
-      FORMAT_MOMENT[temp + 1] = `${SUB_FORMAT[0][j]}${S_1[m]}${SUB_FORMAT[2][j]}${S_2[k]}${SUB_FORMAT[1][j]}`
-      FORMAT_MOMENT[temp + 2] = `${SUB_FORMAT[1][j]}${S_1[m]}${SUB_FORMAT[0][j]}${S_2[k]}${SUB_FORMAT[2][j]}`
-      FORMAT_MOMENT[temp + 3] = `${SUB_FORMAT[1][j]}${S_1[m]}${SUB_FORMAT[2][j]}${S_2[k]}${SUB_FORMAT[0][j]}`
-      FORMAT_MOMENT[temp + 4] = `${SUB_FORMAT[2][j]}${S_1[m]}${SUB_FORMAT[0][j]}${S_2[k]}${SUB_FORMAT[1][j]}`
-      FORMAT_MOMENT[temp + 5] = `${SUB_FORMAT[2][j]}${S_1[m]}${SUB_FORMAT[1][j]}${S_2[k]}${SUB_FORMAT[0][j]}`
-      temp += 6
-    }
+const FORMATS = []
+for (let i = 0; i < PUNCTUATIONS.length; i += 1) {
+  const punctuation = PUNCTUATIONS[i]
+  for (let j = 0; j < SUB_FORMAT[0].length; j += 1) {
+    FORMATS.push(`${SUB_FORMAT[0][j]}${punctuation}${SUB_FORMAT[1][j]}${punctuation}${SUB_FORMAT[2][j]}`)
+    FORMATS.push(`${SUB_FORMAT[0][j]}${punctuation}${SUB_FORMAT[2][j]}${punctuation}${SUB_FORMAT[1][j]}`)
+    FORMATS.push(`${SUB_FORMAT[1][j]}${punctuation}${SUB_FORMAT[0][j]}${punctuation}${SUB_FORMAT[2][j]}`)
+    FORMATS.push(`${SUB_FORMAT[1][j]}${punctuation}${SUB_FORMAT[2][j]}${punctuation}${SUB_FORMAT[0][j]}`)
+    FORMATS.push(`${SUB_FORMAT[2][j]}${punctuation}${SUB_FORMAT[0][j]}${punctuation}${SUB_FORMAT[1][j]}`)
+    FORMATS.push(`${SUB_FORMAT[2][j]}${punctuation}${SUB_FORMAT[1][j]}${punctuation}${SUB_FORMAT[0][j]}`)
   }
 }
+
+// NOTE: FORMATS will be
+// [ DDMMYYYY, DD-MM-YYYY ... MM,DD,YYYY ]
 
 const checking = express.Router()
 
@@ -91,13 +90,11 @@ const checkRangeDate = (datePassword, format) => {
 }
 
 const checkDateFormat = (password) => {
-  for (let i = 0; i < FORMAT_MOMENT.length; i += 1) {
-    if (checkRangeDate(password, FORMAT_MOMENT[i])) return false
+  for (let i = 0; i < FORMATS.length; i += 1) {
+    if (checkRangeDate(password, FORMATS[i])) return false
   }
   return true
 }
-
-console.log(checkDateFormat('2100003'))
 
 const checkDictionary = (password) => {
   const words = DICTIONARY_DATA
