@@ -9,18 +9,17 @@ checking password policy
 - Date format
 - checking pattern (double, triple etc)
 - checking with old password
+- test case
 
 # instruction
-cd server
-yarn
-yarn start
+- cd server
+- yarn
+- yarn start
 
-cd client 
-yarn
-yarn start
+- cd client 
+- yarn
+- yarn start
 
-check result at console
-
-PS Now, this code is on developing so maybe contains many bug 
-
-checking module at server/checking.js
+# more 
+- check result by 'yarn test'
+- check module at server/checking.js

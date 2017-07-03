@@ -14,27 +14,15 @@ checking.use((req, res, next) => {
 
 const checkPattern = (password) => {
   const lengthPassword = password.length
-  let tempPattern = []
+  const tempPattern = []
   tempPattern[0] = password[0]
   let numTemp = 0
-  let subLength = 1
   for (let i = 0; i < lengthPassword - 1; i += 1) {
-    // check repeat pattern
-    const subStr = password.slice(0, subLength)
-    if (subLength < lengthPassword) {
-      if (subStr.repeat(lengthPassword / subLength) === password) {
-        tempPattern = ['']
-        break
-      }
-    }
-    subLength += 1
-
-    // check double triple and sequence
     if (password[i + 1].charCodeAt(0) === (password[i].charCodeAt(0)) + 1) {
       tempPattern[numTemp] += password[i + 1]
     } else if (password[i + 1].charCodeAt(0) === (password[i].charCodeAt(0)) - 1) {
       tempPattern[numTemp] += password[i + 1]
-    } else if (password[i+1] === password[i]) {
+    } else if (password[i + 1] === password[i]) {
       tempPattern[numTemp] += password[i + 1]
     } else {
       numTemp += 1
@@ -62,11 +50,62 @@ const checkOldPassword = (password, oldPasswords) => {
   return false
 }
 
+const swapCheckDate = (day, month, year) => {
+  const rangeYear = 100
+  const timeNow = new Date()
+  const yearNow = timeNow.getFullYear()
+  const yearNowTh = yearNow + 543
+  if (day < 31 && month < 12 &&
+    ((year <= yearNow + rangeYear && year >= yearNow - rangeYear) ||
+    (year <= yearNowTh + rangeYear && year >= yearNowTh - rangeYear))
+  ) {
+    return false
+  }
+  return true
+}
+
 const checkDateFormat = (password) => {
   const checkDate = new Date(password)
-  if (checkDate.toString() === 'Invalid Date') return true
-  return false
+  if (checkDate.toString() !== 'Invalid Date') {
+    const yearPassword = checkDate.getFullYear().toString()
+    const yearLength = yearPassword.length
+    const rangeYear = 100
+    const timeNow = new Date()
+    const yearNow = timeNow.getFullYear()
+    const yearNowTh = yearNow + 543
+    if (((yearPassword <= yearNow + rangeYear && yearPassword >= yearNow - rangeYear) ||
+    (yearPassword <= yearNowTh + rangeYear && yearPassword >= yearNowTh - rangeYear))) {
+      return false
+    }
+    if (yearLength > 4) {
+      const yearPasswordFirst = Number.parseInt(yearPassword.slice(0, 4), 10)
+      const yearPasswordLast = Number.parseInt(yearPassword.slice(yearLength - 4, yearLength), 10)
+      if (((yearPasswordFirst <= yearNow + rangeYear && yearPasswordFirst >= yearNow - rangeYear) ||
+      (yearPasswordFirst <= yearNowTh + rangeYear && yearPasswordFirst >= yearNowTh - rangeYear))) {
+        return false
+      }
+      if (((yearPasswordLast <= yearNow + rangeYear && yearPasswordLast >= yearNow - rangeYear) ||
+      (yearPasswordLast <= yearNowTh + rangeYear && yearPasswordLast >= yearNowTh - rangeYear))) {
+        return false
+      }
+    }
+  }
+  const regexPassword = password.replace(/[^a-zA-Z0-9]/g, '')
+  if (regexPassword) {
+    const splitDay = [0, 0, 2, 6, 4, 6]
+    const splitMonth = [2, 6, 0, 0, 6, 4]
+    const splitYear = [4, 2, 4, 2, 0, 0]
+    for (let i = 0; i < 6; i += 1) {
+      const day = regexPassword.slice(splitDay[i], splitDay[i] + 2)
+      const month = regexPassword.slice(splitMonth[i], splitMonth[i] + 2)
+      const year = regexPassword.slice(splitYear[i], splitYear[i] + 4)
+      if (!swapCheckDate(day, month, year)) return false
+    }
+  }
+  return true
 }
+
+// console.log(checkDateFormat('may'))
 
 const checkDictionary = (password) => {
   const words = DICTIONARY_DATA
@@ -111,4 +150,12 @@ checking.route('/')
       res.send('weak')
     }
   })
-module.exports = { checking, checkPattern, checkOldPassword, checkDateFormat, checkDictionary, checkEightCharactor }
+module.exports = {
+  checking,
+  checkPattern,
+  checkOldPassword,
+  checkDateFormat,
+  checkDictionary,
+  checkEightCharactor,
+  checkSameAsUsername
+}

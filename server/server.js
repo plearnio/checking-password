@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 
 const { checking } = require('./route/checking')
 
-const PORT = 4000
+const PORT = 5000
 const server = express()
 
 server.use('*', cors({ origin: 'http://localhost:3000' }))
