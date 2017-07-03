@@ -6,6 +6,30 @@ const fs = require('fs')
 
 const DICTIONARY_DATA = fs.readFileSync(path.join(__dirname, './words.txt'), 'utf8').toString()
 
+const S_1 = ['', '/', '-', ',', '\\']
+const S_2 = ['', '/', '-', ',', '\\']
+const SUB_FORMAT = [
+  ['DD', 'DD', 'D', 'DD', 'DD', 'D'],
+  ['MM', 'MMM', 'MMM', 'MMMM', 'MMMM', 'MMMM'],
+  ['YYYY', 'YYYY', 'YYYY', 'YY', 'YYYY', 'YYYY'],
+]
+
+const FORMAT_MOMENT = []
+let temp = 0
+for (let m = 0; m < S_1.length; m += 1) {
+  for (let k = 0; k < S_2.length; k += 1) {
+    for (let j = 0; j < SUB_FORMAT[0].length; j += 1) {
+      FORMAT_MOMENT[temp] = `${SUB_FORMAT[0][j]}${S_1[m]}${SUB_FORMAT[1][j]}${S_2[k]}${SUB_FORMAT[2][j]}`
+      FORMAT_MOMENT[temp + 1] = `${SUB_FORMAT[0][j]}${S_1[m]}${SUB_FORMAT[2][j]}${S_2[k]}${SUB_FORMAT[1][j]}`
+      FORMAT_MOMENT[temp + 2] = `${SUB_FORMAT[1][j]}${S_1[m]}${SUB_FORMAT[0][j]}${S_2[k]}${SUB_FORMAT[2][j]}`
+      FORMAT_MOMENT[temp + 3] = `${SUB_FORMAT[1][j]}${S_1[m]}${SUB_FORMAT[2][j]}${S_2[k]}${SUB_FORMAT[0][j]}`
+      FORMAT_MOMENT[temp + 4] = `${SUB_FORMAT[2][j]}${S_1[m]}${SUB_FORMAT[0][j]}${S_2[k]}${SUB_FORMAT[1][j]}`
+      FORMAT_MOMENT[temp + 5] = `${SUB_FORMAT[2][j]}${S_1[m]}${SUB_FORMAT[1][j]}${S_2[k]}${SUB_FORMAT[0][j]}`
+      temp += 6
+    }
+  }
+}
+
 const checking = express.Router()
 
 checking.use((req, res, next) => {
@@ -67,55 +91,13 @@ const checkRangeDate = (datePassword, format) => {
 }
 
 const checkDateFormat = (password) => {
-  const regexPassword = password.replace(/[^a-zA-Z0-9]/g, '')
-  const formatMoment = [
-    'DDMMYYYY',
-    'DDYYYYMM',
-    'MMDDYYYY',
-    'MMYYYYDD',
-    'YYYYDDMM',
-    'YYYYMMDD',
-
-    'DDMMMYYYY',
-    'DDYYYYMMM',
-    'MMMDDYYYY',
-    'MMMYYYYDD',
-    'YYYYDDMMM',
-    'YYYYMMMDD',
-
-    'DMMMYYYY',
-    'DYYYYMMM',
-    'MMMDYYYY',
-    'MMMYYYYD',
-    'YYYYDMMM',
-    'YYYYMMMD',
-
-    'DDYYMMMM',
-    'DDMMMMYY',
-    'YYDDMMMM',
-    'YYMMMMDD',
-    'MMMMDDYY',
-    'MMMMYYDD',
-
-    'DDYYYYMMMM',
-    'DDMMMMYYYY',
-    'YYYYDDMMMM',
-    'YYYYMMMMDD',
-    'MMMMDDYYYY',
-    'MMMMYYYYDD',
-
-    'DYYYYMMMM',
-    'DMMMMYYYY',
-    'YYYYDMMMM',
-    'YYYYMMMMD',
-    'MMMMDYYYY',
-    'MMMMYYYYD'
-  ]
-  for (let i = 0; i < formatMoment.length; i += 1) {
-    if (checkRangeDate(regexPassword, formatMoment[i])) return false
+  for (let i = 0; i < FORMAT_MOMENT.length; i += 1) {
+    if (checkRangeDate(password, FORMAT_MOMENT[i])) return false
   }
   return true
 }
+
+console.log(checkDateFormat('2100003'))
 
 const checkDictionary = (password) => {
   const words = DICTIONARY_DATA
